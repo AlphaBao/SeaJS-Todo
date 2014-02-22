@@ -1,0 +1,63 @@
+PORT = 2222
+
+express = require 'express'
+app     = express()
+{print} = require 'util'
+{spawn} = require 'child_process'
+{exec}  = require 'child_process'
+
+WEBAPPDIR = process.cwd().slice 0, process.cwd().indexOf("seajs-mvc")
+WEBDIR = process.cwd().slice process.cwd().indexOf("seajs-mvc"), process.cwd().indexOf("assets")
+
+compileApp = (type) ->
+  switch type
+    when "watch"
+      coffee = spawn "coffee", ["-wbco", "js", "coffee"]
+    else
+      coffee = spawn "coffee", ["-bco", "js", "coffee"]
+
+  coffee.stdout.on "data", (data) ->
+    print data.toString()
+  coffee.stderr.on "data", (data) ->
+    print data.toString()
+
+  switch type
+    when "build"
+      coffee.on "exit", (data) ->
+        print "Build Success!"
+
+option "-n", "--nolog", "Enable & Disable web access log. Usage: cake --nolog server"
+
+task "build", "Compile [coffee] to [js]", ->
+  compileApp "build"
+
+task "watch", "Compile and watch", ->
+  compileApp "watch"
+
+task "server", "Compile and start a server.", (options) ->
+  options.nolog ? app.use express.logger("dev")
+  app.use express.directory WEBAPPDIR, { icons: true }
+  app.use express.static WEBAPPDIR
+
+  app.listen PORT
+  console.log "Current directory: <#{WEBAPPDIR}>. Host server at http://127.0.0.1:#{PORT}/"
+
+  setTimeout ->
+    url = "http://127.0.0.1:#{PORT}/#{WEBDIR}index.html"
+    platform = require("os").platform()
+
+    switch platform
+      when "darwin"
+        exec "open #{url}"
+      when "win32"
+        exec "explorer #{url}"
+      when "linux"
+        exec "xdg-open #{url}"
+  , 1000
+
+  invoke "watch"
+
+process.on 'exit', (code)->
+  # print "Cake will exit(#{code})\n"
+  print "\n-------------------------------\nfinished ... success\n"
+

@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head> 
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Todos - CoffeeScript</title>
+  <link rel="stylesheet" type="text/css" href="assets/css/index.css">
+</head>
+<body>
+  <article id="todoapp">
+    <header id="header">
+      <h1>Todos</h1>
+      <input id="new-todo" type="text" placeholder="What needs to be done?" autofocus>
+    </header>
+
+    <section id="main">
+      <input id="toggle-all" type="checkbox">
+      <label for="toggle-all">Mark all as complete</label>
+      <ul id="todo-list"></ul>
+    </section>
+
+    <footer id="footer"></footer>
+  </article>
+
+  <script type="text/template" id="item-template">
+    <div class="view">
+      <input class="toggle" type="checkbox" <%= done ? 'checked="checked"' : '' %> />
+      <label><%- title%></label>
+      <a class="destroy">&larr;</a>
+    </div>
+    <input class="edit" type="text" value="<%- title %>" />
+  </script>
+
+  <script type="text/template" id="stats-template">
+    <% if (done) { %>
+      <a id="clear-completed">Clear <%= done %> completed <%= done == 1 ? 'item' : 'items' %></a>
+    <% } %>
+    <div class="todo-count"><b><%= remaining %></b> <%= remaining == 1 ? 'item' : 'items' %> left</div>
+  </script>
+
+  <script src="../sea-modules/seajs/seajs/2.1.1/sea.js"></script>
+  <script>
+    seajs.config({
+      base: "../sea-modules/",
+      alias: {
+        "$": "jquery/jquery/1.10.1/jquery.js",
+        "underscore": "gallery/underscore/1.5.2/underscore.js",
+        "backbone": "gallery/backbone/1.1.0/backbone.js",
+        "backboneLocalStorage": "vendor/backbone-localStorage/1.1.0/backbone.localStorage.js"
+      }
+    });
+
+    seajs.use("./assets/js/index");
+  </script>
+</body>
+</html>
